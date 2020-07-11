@@ -1,0 +1,28 @@
+#!/bin/dash
+
+# Checking .shrug exists
+if test -d ".shrug"
+then
+    # Creating index directory if required
+    if ! test -d ".shrug/index"
+    then
+        mkdir ".shrug/index"
+    fi
+
+    # Adding all files given in the argument
+    for file in $@
+    do
+        # Testing if file exists
+        if test -e $file
+        then
+            # Adding new file to the list to be added
+            cp $file .shrug/index/$file
+        else
+            # Unsuccessfully added file
+            echo "shrug-add: error: can not open '$file'"
+        fi
+    done
+else
+    # Cannot add files as .shrug does not exist
+    echo "shrug-add: error: no .shrug directory containing shrug repository exists"
+fi

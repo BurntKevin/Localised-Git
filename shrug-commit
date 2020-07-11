@@ -1,0 +1,74 @@
+#!/bin/dash
+
+new_items() {
+    # Checking if it is a directory
+    if test -d .shrug/$(($i - 1))
+    then
+        # Checking if there is a new file
+        for new_file in .shrug/index/*
+        do
+            # Getting name of current file
+            file=`echo $new_file | cut -d"/" -f3`
+
+            # Checking if file exists
+            if test -e ".shrug/$(($i - 1))/saved/$file"
+            then
+                # File exists, checking if there is a difference
+                if [ $(diff $new_file ".shrug/$(($i - 1))/saved/$file" | wc -l ) != 0 ]
+                then
+                    return 1
+                fi
+            else
+                # File does not exist, there are new items
+                return 1
+            fi
+        done
+    else
+        # Previous commit does not exist
+        return 1
+    fi
+    # Could not find a new file
+    return 0
+}
+
+# Getting latest commit id
+i=0
+while true
+do
+    if ! test -d ".shrug/$i"
+    then
+        break
+    fi
+    i=$(($i+1))
+done
+
+# Adding all items if required
+if [ -eq "-a" ]
+then
+    echo K
+fi
+
+# Checking if there are items to commit
+new_items
+if [ $? -eq "1" ]
+then
+    # Creating latest commit folder
+    mkdir ".shrug/$i"
+
+    # Saving files
+    mkdir ".shrug/$i/saved"
+    for line in $(ls .shrug/index)
+    do
+        cp .shrug/index/$line ".shrug/$i/saved/$line"
+    done
+
+    # Adding commit message
+    echo $2 > ".shrug/$i/message.txt"
+
+    # Notifying user of completed commit
+    echo Committed as commit $i
+
+else
+    echo nothing to commit
+fi
+

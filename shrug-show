@@ -1,0 +1,39 @@
+#!/bin/dash
+
+commit=`echo $1 | cut -d":" -f1`
+file=`echo $1 | cut -d":" -f2`
+
+# Checking request
+if [ "$commit" = "" ]
+then
+    # If no commit, provide index information
+    # Checking validity of commit
+    if ! test -e .shrug/index/$file
+    then
+        # File cannot be found
+        echo "shrug-show: error: '$file' not found in index"
+    else
+        # File can be found
+        cat .shrug/index/$file
+    fi
+else
+    # If commit details, provide file information
+
+    # Checking if commit is valid
+    # Testing if the commit exists
+    if test -d .shrug/$commit
+    then
+        # Testing if the file exists
+        if test -e .shrug/$commit/saved/$file
+        then
+            # File exists
+            cat .shrug/$commit/saved/$file
+        else
+            # File does not exist
+            echo "shrug-show: error: '$file' not found in commit $commit"
+        fi
+    else
+        # Could not find directory containing file
+        echo "shrug-show: error: unknown commit '$commit'"
+    fi
+fi

@@ -1,0 +1,13 @@
+#!/bin/dash
+
+# Getting all directories from most recent commit first
+for directory in $(ls .shrug/ -r)
+do
+    # If it is not the index file
+    if [ $directory != "index" ]
+    then
+        # Print details about file
+        echo -n "$directory "
+        cat ".shrug/$directory/message.txt"
+    fi
+done
