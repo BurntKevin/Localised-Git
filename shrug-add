@@ -17,6 +17,9 @@ then
         then
             # Adding new file to the list to be added
             cp $file .shrug/index/$file
+        elif test -e .shrug/index/$file
+        then
+            rm .shrug/index/$file
         else
             # Unsuccessfully added file
             echo "shrug-add: error: can not open '$file'"

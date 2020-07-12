@@ -1,0 +1,70 @@
+#!/bin/dash
+
+# Getting latest commit id
+i=0
+while true
+do
+    if ! test -d ".shrug/$i"
+    then
+        break
+    fi
+    i=$(($i+1))
+done
+i=$(($i-1))
+
+# Checking for new files being added
+for file in .shrug/$i/saved/*
+do
+    file=`echo $file | cut -d"/" -f4`
+
+    if ! test -e $file && ! test -e .shrug/index/$file
+    then
+        echo $file - deleted
+    elif ! test -e $file
+    then
+        echo $file - file deleted
+    elif test -e .shrug/index/$file && test -e .shrug/$i/saved/$file
+    then
+        if [ $(diff $file .shrug/index/$file | wc -l) != 0 ] && [ $(diff .shrug/$i/saved/$file .shrug/index/$file | wc -l) != 0 ]
+        then
+            # File has been edited since it was added
+            echo $file - file changed, different changes staged for commit
+        elif [ $(diff .shrug/$i/saved/$file .shrug/index/$file | wc -l) = 0 ] && [ $(diff $file .shrug/index/$file | wc -l) = 0 ]
+        then
+            # File is the same
+            echo $file - same as repo
+        elif [ $(diff $file .shrug/index/$file | wc -l) = 0 ]
+        then
+            # File is successfully prepared to be commited
+            echo $file - file changed, changes staged for commit
+        elif [ $(diff $file .shrug/$i/saved/$file | wc -l) != 0 ] && [ $(diff .shrug/index/$file .shrug/$i/saved/$file | wc -l) = 0 ]
+        then
+            # File has been edited but not yet added
+            echo $file - file changed, changes not staged for commit
+        fi
+    fi
+done
+
+# Checking for deleted files in user's repository
+if [ $(ls .shrug/index | wc -l) != 0 ]
+then
+    for file in .shrug/index/*
+    do
+        file=`echo $file | cut -d"/" -f3`
+        if ! test -e .shrug/$i/saved/$file
+        then
+            # File recently added
+            echo $file - added to index
+        fi
+    done
+fi
+
+# Checking for changed files
+for file in *
+do
+    if ! test -e .shrug/index/$file
+    then
+        # File is untracked
+        echo $file - untracked
+    fi
+done

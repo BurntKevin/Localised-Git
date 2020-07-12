@@ -1,2 +1,7 @@
-11/07/20 | 9:00 | 10:32 | Preparation | Reading and planning specifications
-11/07/20 | 3:42 | 6:43 | Subset 0 | Completing subset 0 along with a bit of subset 1 due to tests
+11/07/20 | 9:00am | 10:32am | Preparation | Reading and planning specifications
+11/07/20 | 3:42pm | 6:43pm | Subset 0 | Completed MVP subset 0 along with a bit of subset 1 due to tests
+11/07/20 | 9:22pm | 12:09am | Subset 1 | Completed MVP subset 1 up to shrug-status - got a bit stuck on the error management of shrug-rm
+12/07/20 | 10:52am | 1:28pm | Subset 1 | Went up to shrug-show but I am stuck on shrug-show as for some reason it is printing non-existent files so I am going to ask a tutor
+12/07/20 | 1:33pm | 1:50pm | Subset 1 | Figured out the bug, the directory was empty and hence it was using '*' as the files
+12/07/20 | 1:50pm | 1:54pm | Subset 1 | Completed MVP of subset1 after finishing off some styling and autotesting
+12/07/20 | 1:54pm | 

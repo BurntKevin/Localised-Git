@@ -4,7 +4,7 @@ new_items() {
     # Checking if it is a directory
     if test -d .shrug/$(($i - 1))
     then
-        # Checking if there is a new file
+        # Checking if there is a new file in index
         for new_file in .shrug/index/*
         do
             # Getting name of current file
@@ -23,12 +23,27 @@ new_items() {
                 return 1
             fi
         done
+
+        # Checking if there is a newly deleted file
+        for new_file in .shrug/$(($i - 1))/saved/*
+        do
+            # Getting name of current file
+            file=`echo $new_file | cut -d"/" -f4`
+
+            # Checking if file exists
+            if ! test -e ".shrug/index/$file"
+            then
+                # File got removed exists, checking if there is a difference
+                return 1
+            fi
+        done
+
+        # Could not find a new file
+        return 0
     else
-        # Previous commit does not exist
+        # Directory does not exist
         return 1
     fi
-    # Could not find a new file
-    return 0
 }
 
 # Getting latest commit id
@@ -42,13 +57,23 @@ do
     i=$(($i+1))
 done
 
-# Adding all items if required
-if [ -eq "-a" ]
+# Checking if it is a new commit or not
+if [ $1 = "-a" ]
 then
-    echo K
+    # Requires committing all items
+    for file in *
+    do
+        sh shrug-add $file
+    done
+
+    # Obtaining message
+    message=$3
+else
+    # Obtaining message
+    message=$2
 fi
 
-# Checking if there are items to commit
+# # Checking if there are items to commit
 new_items
 if [ $? -eq "1" ]
 then
@@ -63,7 +88,7 @@ then
     done
 
     # Adding commit message
-    echo $2 > ".shrug/$i/message.txt"
+    echo $message > ".shrug/$i/message.txt"
 
     # Notifying user of completed commit
     echo Committed as commit $i
@@ -71,4 +96,3 @@ then
 else
     echo nothing to commit
 fi
-

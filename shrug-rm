@@ -1,0 +1,59 @@
+#!/bin/dash
+
+# Getting latest commit id
+i=0
+while true
+do
+    if ! test -d ".shrug/$i"
+    then
+        break
+    fi
+    i=$(($i+1))
+done
+i=$(($i-1))
+
+for argument in $@
+do
+    # Deleting file from index
+    if [ $argument != --force ] && [ $argument != --cached ]
+    then
+        if ! test -e .shrug/index/$argument
+        then
+            echo "shrug-rm: error: '$argument' is not in the shrug repository"
+            continue
+        fi
+
+        if [ $1 = --force ]
+        then
+            if [ $2 != --cached ]
+            then
+                rm $argument 2> /dev/null
+            fi
+            rm .shrug/index/$argument 2> /dev/null
+        elif [ $1 != --cached ]
+        then
+            if [ $(diff $argument .shrug/index/$argument | wc -l) != 0 ] && test -e .shrug/$i/saved/$argument && [ $(diff .shrug/index/$argument .shrug/$i/saved/$argument | wc -l) != 0 ]
+            then
+                echo "shrug-rm: error: '$argument' in index is different to both working file and repository"
+            elif ! test -e .shrug/$i/saved/$argument || [ $(diff .shrug/index/$argument .shrug/$i/saved/$argument | wc -l) != 0 ]
+            then
+                echo "shrug-rm: error: '$argument' has changes staged in the index"
+            elif test -e .shrug/$i/saved/$argument && [ $(diff $argument .shrug/$i/saved/$argument | wc -l) != 0 ]
+            then
+                echo "shrug-rm: error: '$argument' in repository is different to working file"
+            else
+                rm $argument
+                rm .shrug/index/$argument
+            fi
+        elif [ $1 = --cached ]
+        then
+            # Removing if the file is not different
+            if [ $(diff $argument .shrug/index/$argument | wc -l) != 0 ] && test -e .shrug/$i/saved/$argument && [ $(diff .shrug/index/$argument .shrug/$i/saved/$argument | wc -l) != 0 ]
+            then
+                echo "shrug-rm: error: '$argument' in index is different to both working file and repository"
+            else
+                rm .shrug/index/$argument
+            fi
+        fi
+    fi
+done
