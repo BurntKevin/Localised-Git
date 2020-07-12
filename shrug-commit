@@ -1,44 +1,54 @@
 #!/bin/dash
 
 new_items() {
-    # Checking if it is a directory
-    if test -d .shrug/$(($i - 1))
+    # Checking if the previous commit is a directory and still exists
+    if test -d .shrug/branches/$current_branch/$previous_commit_id
     then
         # Checking if there is a new file in index
-        for new_file in .shrug/index/*
-        do
-            # Getting name of current file
-            file=`echo $new_file | cut -d"/" -f3`
+        # Testing if the directory contains items
+        if [ $(ls .shrug/branches/$current_branch/index | wc -l) != 0 ]
+        then
+            # There are files to loop through
+            for new_file in .shrug/branches/$current_branch/index/*
+            do
+                # Getting name of current file
+                file=`echo $new_file | cut -d"/" -f5`
 
-            # Checking if file exists
-            if test -e ".shrug/$(($i - 1))/saved/$file"
-            then
-                # File exists, checking if there is a difference
-                if [ $(diff $new_file ".shrug/$(($i - 1))/saved/$file" | wc -l ) != 0 ]
+                # Checking if files exists
+                if test -e .shrug/branches/$current_branch/$previous_commit_id/saved/$file
                 then
+                    # File exists, checking if there is a difference
+                    if [ $(diff $new_file .shrug/branches/$current_branch/$previous_commit_id/saved/$file | wc -l ) != 0 ]
+                    then
+                        # There is a changed file
+                        return 1
+                    fi
+                else
+                    # A file got removed
                     return 1
                 fi
-            else
-                # File does not exist, there are new items
-                return 1
-            fi
-        done
+            done
+        fi
 
         # Checking if there is a newly deleted file
-        for new_file in .shrug/$(($i - 1))/saved/*
-        do
-            # Getting name of current file
-            file=`echo $new_file | cut -d"/" -f4`
+        if [ $(ls .shrug/branches/$current_branch/$previous_commit_id/saved | wc -l) != 0 ]
+        then
+            # There are files in the directory
+            for new_file in .shrug/branches/$current_branch/$previous_commit_id/saved/*
+            do
+                # Getting name of current file
+                file=`echo $new_file | cut -d"/" -f6`
 
-            # Checking if file exists
-            if ! test -e ".shrug/index/$file"
-            then
-                # File got removed exists, checking if there is a difference
-                return 1
-            fi
-        done
+                # Checking if file exists
+                if ! test -e .shrug/branches/$current_branch/index/$file
+                then
+                    # File got removed, there is a difference
+                    return 1
+                fi
+            done
+        fi
 
-        # Could not find a new file
+        # Could not find a difference
         return 0
     else
         # Directory does not exist
@@ -46,25 +56,32 @@ new_items() {
     fi
 }
 
-# Getting latest commit id
-i=0
-while true
-do
-    if ! test -d ".shrug/$i"
-    then
-        break
-    fi
-    i=$(($i+1))
-done
+# Obtaining current branch
+current_branch=`cat .shrug/current_branch`
+
+# Getting next commit id
+next_commit_id=`cat .shrug/commit_number`
+
+# Getting previous commit id
+previous_commit_id=`ls .shrug/branches/$current_branch | sort -n | tail -1`
+if [ $previous_commit_id = "index" ]
+then
+    previous_commit_id=0
+fi
 
 # Checking if it is a new commit or not
 if [ $1 = "-a" ]
 then
     # Requires committing all items
-    for file in *
-    do
-        sh shrug-add $file
-    done
+    # Checking if the directory has items
+    if [ $(ls | wc -l ) != 0 ]
+    then
+        # Iterating through all files
+        for file in *
+        do
+            sh shrug-add $file
+        done
+    fi
 
     # Obtaining message
     message=$3
@@ -78,21 +95,30 @@ new_items
 if [ $? -eq "1" ]
 then
     # Creating latest commit folder
-    mkdir ".shrug/$i"
+    mkdir .shrug/branches/$current_branch/$next_commit_id
 
     # Saving files
-    mkdir ".shrug/$i/saved"
-    for line in $(ls .shrug/index)
-    do
-        cp .shrug/index/$line ".shrug/$i/saved/$line"
-    done
+    mkdir .shrug/branches/$current_branch/$next_commit_id/saved
+
+    # Checking if the directory is empty
+    if [ $(ls .shrug/branches/$current_branch/index | wc -l) != 0 ]
+    then
+        # Iterating through all files
+        for line in $(ls .shrug/branches/$current_branch/index)
+        do
+            cp .shrug/branches/$current_branch/index/$line .shrug/branches/$current_branch/$next_commit_id/saved/$line
+        done
+    fi
 
     # Adding commit message
-    echo $message > ".shrug/$i/message.txt"
+    echo $message > .shrug/branches/$current_branch/$next_commit_id/message.txt
+
+    # Updating commit number
+    echo $((next_commit_id + 1)) > .shrug/commit_number
 
     # Notifying user of completed commit
-    echo Committed as commit $i
-
+    echo Committed as commit $next_commit_id
 else
+    # Notifying user of issue
     echo nothing to commit
 fi

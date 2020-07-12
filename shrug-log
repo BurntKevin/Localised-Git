@@ -1,13 +1,16 @@
 #!/bin/dash
 
+# Obtaining current branch
+current_branch=`cat .shrug/current_branch`
+
 # Getting all directories from most recent commit first
-for directory in $(ls .shrug/ -r)
+for commit in $(ls .shrug/branches/$current_branch -r)
 do
     # If it is not the index file
-    if [ $directory != "index" ]
+    if [ $commit != "index" ]
     then
-        # Print details about file
-        echo -n "$directory "
-        cat ".shrug/$directory/message.txt"
+        # Print commit details
+        echo -n "$commit "
+        cat ".shrug/branches/$current_branch/$commit/message.txt"
     fi
 done

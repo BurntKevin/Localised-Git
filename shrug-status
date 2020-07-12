@@ -1,70 +1,93 @@
 #!/bin/dash
 
-# Getting latest commit id
-i=0
-while true
-do
-    if ! test -d ".shrug/$i"
-    then
-        break
-    fi
-    i=$(($i+1))
-done
-i=$(($i-1))
+# Obtaining current branch
+current_branch=`cat .shrug/current_branch`
+
+# Getting previous commit id
+previous_commit_id=`ls .shrug/branches/$current_branch | sort -n | tail -1`
+if [ $previous_commit_id = "index" ]
+then
+    previous_commit_id=0
+fi
 
 # Checking for new files being added
-for file in .shrug/$i/saved/*
-do
-    file=`echo $file | cut -d"/" -f4`
+# Checking if the directory contains files
+if [ $(ls .shrug/branches/$current_branch/$previous_commit_id/saved | wc -l) != 0 ]
+then
+    # There are files in the directory
+    for file in .shrug/branches/$current_branch/$previous_commit_id/saved/*
+    do
+        file=`echo $file | cut -d"/" -f6`
 
-    if ! test -e $file && ! test -e .shrug/index/$file
-    then
-        echo $file - deleted
-    elif ! test -e $file
-    then
-        echo $file - file deleted
-    elif test -e .shrug/index/$file && test -e .shrug/$i/saved/$file
-    then
-        if [ $(diff $file .shrug/index/$file | wc -l) != 0 ] && [ $(diff .shrug/$i/saved/$file .shrug/index/$file | wc -l) != 0 ]
+        if ! test -e $file && ! test -e .shrug/branches/$current_branch/index/$file
         then
-            # File has been edited since it was added
-            echo $file - file changed, different changes staged for commit
-        elif [ $(diff .shrug/$i/saved/$file .shrug/index/$file | wc -l) = 0 ] && [ $(diff $file .shrug/index/$file | wc -l) = 0 ]
+            echo $file - deleted
+        elif ! test -e $file
         then
-            # File is the same
-            echo $file - same as repo
-        elif [ $(diff $file .shrug/index/$file | wc -l) = 0 ]
+            echo $file - file deleted
+        elif test -e .shrug/branches/$current_branch/index/$file && test -e .shrug/branches/$current_branch/$previous_commit_id/saved/$file
         then
-            # File is successfully prepared to be commited
-            echo $file - file changed, changes staged for commit
-        elif [ $(diff $file .shrug/$i/saved/$file | wc -l) != 0 ] && [ $(diff .shrug/index/$file .shrug/$i/saved/$file | wc -l) = 0 ]
-        then
-            # File has been edited but not yet added
-            echo $file - file changed, changes not staged for commit
+            if [ $(diff $file .shrug/branches/$current_branch/index/$file | wc -l) != 0 ] && [ $(diff .shrug/branches/$current_branch/$previous_commit_id/saved/$file .shrug/branches/$current_branch/index/$file | wc -l) != 0 ]
+            then
+                # File has been edited since it was added
+                echo $file - file changed, different changes staged for commit
+            elif [ $(diff .shrug/branches/$current_branch/$previous_commit_id/saved/$file .shrug/branches/$current_branch/index/$file | wc -l) = 0 ] && [ $(diff $file .shrug/branches/$current_branch/index/$file | wc -l) = 0 ]
+            then
+                # File is the same
+                echo $file - same as repo
+            elif [ $(diff $file .shrug/branches/$current_branch/index/$file | wc -l) = 0 ]
+            then
+                # File is successfully prepared to be commited
+                echo $file - file changed, changes staged for commit
+            elif [ $(diff $file .shrug/branches/$current_branch/$previous_commit_id/saved/$file | wc -l) != 0 ] && [ $(diff .shrug/branches/$current_branch/index/$file .shrug/branches/$current_branch/$previous_commit_id/saved/$file | wc -l) = 0 ]
+            then
+                # File has been edited but not yet added
+                echo $file - file changed, changes not staged for commit
+            fi
         fi
-    fi
-done
+    done
+fi
 
 # Checking for deleted files in user's repository
-if [ $(ls .shrug/index | wc -l) != 0 ]
+if [ $(ls .shrug/branches/$current_branch/index | wc -l) != 0 ]
 then
-    for file in .shrug/index/*
+    # For all files added to the index
+    for file in .shrug/branches/$current_branch/index/*
     do
-        file=`echo $file | cut -d"/" -f3`
-        if ! test -e .shrug/$i/saved/$file
+        # Parsing file name for only the file's name
+        file=`echo $file | cut -d"/" -f5`
+
+        # Checking if the file is new
+        if ! test -e .shrug/branches/$current_branch/$previous_commit_id/saved/$file
         then
-            # File recently added
-            echo $file - added to index
+            # File has been recently added to the index
+            if ! test -e $file
+            then
+                # File has been deleted from main
+                echo $file - added to index, file deleted
+            elif [ $(diff $file .shrug/branches/$current_branch/index/$file | wc -l) != 0 ]
+            then
+                # File has been edited
+                echo $file - added to index, file changed
+            else
+                echo $file - added to index
+            fi
         fi
     done
 fi
 
 # Checking for changed files
-for file in *
-do
-    if ! test -e .shrug/index/$file
-    then
-        # File is untracked
-        echo $file - untracked
-    fi
-done
+# Checking if there are files in the directory
+if [ $(ls | wc -l) != 0 ]
+then
+    # There are files in the directory
+    for file in *
+    do
+        # Finding new files
+        if ! test -e .shrug/branches/$current_branch/index/$file
+        then
+            # File is untracked
+            echo $file - untracked
+        fi
+    done
+fi

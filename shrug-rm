@@ -1,58 +1,71 @@
 #!/bin/dash
 
-# Getting latest commit id
-i=0
-while true
-do
-    if ! test -d ".shrug/$i"
-    then
-        break
-    fi
-    i=$(($i+1))
-done
-i=$(($i-1))
+# Obtaining current branch
+current_branch=`cat .shrug/current_branch`
 
-for argument in $@
+# Getting previous commit id
+previous_commit_id=`ls .shrug/branches/$current_branch | sort -n | tail -1`
+if [ $previous_commit_id = "index" ]
+then
+    previous_commit_id=0
+fi
+
+# Removing files given by the user
+# Looping through all files given by user
+for file in $@
 do
-    # Deleting file from index
-    if [ $argument != --force ] && [ $argument != --cached ]
+    # Deleting file from index if it is not a keyword
+    if [ $file != --force ] && [ $file != --cached ]
     then
-        if ! test -e .shrug/index/$argument
+        # Checking if the argument exists in the index
+        if ! test -e .shrug/branches/$current_branch/index/$file
         then
-            echo "shrug-rm: error: '$argument' is not in the shrug repository"
+            echo "shrug-rm: error: '$file' is not in the shrug repository"
             continue
         fi
 
+        # Checking type of removal requested
         if [ $1 = --force ]
         then
+            # Force removal requested - deleting no matter what
             if [ $2 != --cached ]
             then
-                rm $argument 2> /dev/null
+                # Removing if cached option is not chosen
+                rm $file 2> /dev/null
             fi
-            rm .shrug/index/$argument 2> /dev/null
+
+            # Removing, errors will be ignored
+            rm .shrug/branches/$current_branch/index/$file 2> /dev/null
         elif [ $1 != --cached ]
         then
-            if [ $(diff $argument .shrug/index/$argument | wc -l) != 0 ] && test -e .shrug/$i/saved/$argument && [ $(diff .shrug/index/$argument .shrug/$i/saved/$argument | wc -l) != 0 ]
+            # Normal deletion - files which have been edited upon are not deleted
+            if [ $(diff $file .shrug/branches/$current_branch/index/$file | wc -l) != 0 ] && test -e .shrug/branches/$current_branch/$previous_commit_id/saved/$file && [ $(diff .shrug/branches/$current_branch/index/$file .shrug/branches/$current_branch/$previous_commit_id/saved/$file | wc -l) != 0 ]
             then
-                echo "shrug-rm: error: '$argument' in index is different to both working file and repository"
-            elif ! test -e .shrug/$i/saved/$argument || [ $(diff .shrug/index/$argument .shrug/$i/saved/$argument | wc -l) != 0 ]
+                # File is different from index to working to repository
+                echo "shrug-rm: error: '$file' in index is different to both working file and repository"
+            elif ! test -e .shrug/branches/$current_branch/$previous_commit_id/saved/$file || [ $(diff .shrug/branches/$current_branch/index/$file .shrug/branches/$current_branch/$previous_commit_id/saved/$file | wc -l) != 0 ]
             then
-                echo "shrug-rm: error: '$argument' has changes staged in the index"
-            elif test -e .shrug/$i/saved/$argument && [ $(diff $argument .shrug/$i/saved/$argument | wc -l) != 0 ]
+                # File in index has been edited since last commit
+                echo "shrug-rm: error: '$file' has changes staged in the index"
+            elif test -e .shrug/branches/$current_branch/$previous_commit_id/saved/$file && [ $(diff $file .shrug/branches/$current_branch/$previous_commit_id/saved/$file | wc -l) != 0 ]
             then
-                echo "shrug-rm: error: '$argument' in repository is different to working file"
+                # Working file is different to repository file
+                echo "shrug-rm: error: '$file' in repository is different to working file"
             else
-                rm $argument
-                rm .shrug/index/$argument
+                # Successful deletion of files
+                rm $file
+                rm .shrug/branches/$current_branch/index/$file
             fi
         elif [ $1 = --cached ]
         then
             # Removing if the file is not different
-            if [ $(diff $argument .shrug/index/$argument | wc -l) != 0 ] && test -e .shrug/$i/saved/$argument && [ $(diff .shrug/index/$argument .shrug/$i/saved/$argument | wc -l) != 0 ]
+            if [ $(diff $file .shrug/branches/$current_branch/index/$file | wc -l) != 0 ] && test -e .shrug/branches/$current_branch/$previous_commit_id/saved/$file && [ $(diff .shrug/branches/$current_branch/index/$file .shrug/branches/$current_branch/$previous_commit_id/saved/$file | wc -l) != 0 ]
             then
-                echo "shrug-rm: error: '$argument' in index is different to both working file and repository"
+                # File in working file is different to index and repository
+                echo "shrug-rm: error: '$file' in index is different to both working file and repository"
             else
-                rm .shrug/index/$argument
+                # Successfully deleting files
+                rm .shrug/branches/$current_branch/index/$file
             fi
         fi
     fi

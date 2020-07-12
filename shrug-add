@@ -3,23 +3,23 @@
 # Checking .shrug exists
 if test -d ".shrug"
 then
-    # Creating index directory if required
-    if ! test -d ".shrug/index"
-    then
-        mkdir ".shrug/index"
-    fi
+    # .shrug exists
+    # Obtaining current branch
+    current_branch=`cat .shrug/current_branch`
 
     # Adding all files given in the argument
     for file in $@
     do
-        # Testing if file exists
         if test -e $file
         then
+            # Newly added file
             # Adding new file to the list to be added
-            cp $file .shrug/index/$file
-        elif test -e .shrug/index/$file
+            cp $file .shrug/branches/$current_branch/index/$file
+        elif test -e .shrug/branches/$current_branch/index/$file
         then
-            rm .shrug/index/$file
+            # File does not exist in working environment but exists in index
+            # Deleting file
+            rm .shrug/branches/$current_branch/index/$file
         else
             # Unsuccessfully added file
             echo "shrug-add: error: can not open '$file'"

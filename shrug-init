@@ -1,12 +1,24 @@
 #!/bin/dash
 
 # Testing if the .shrug has already been created
-if ! test -d ".shrug"
+if ! test -d .shrug
 then
-    # Creating new .shrug
+    # .shrug does not exist
+    # Creating new .shrug repository
     mkdir .shrug
-    echo "Initialized empty shrug repository in .shrug"
+    mkdir .shrug/branches
+
+    # Adding .shrug information
+    echo master > .shrug/current_branch
+    echo 0 > .shrug/commit_number
+
+    # Creating master branch
+    sh shrug-branch master
+
+    # Notifying user of successful creation of repository
+    echo Initialized empty shrug repository in .shrug
 else
     # .shrug already exists
-    echo "shrug-init: error: .shrug already exists"
+    # Notifying user that there is already a repository created
+    echo shrug-init: error: .shrug already exists
 fi

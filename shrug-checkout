@@ -1,0 +1,46 @@
+#!/bin/dash
+
+# Obtaining current branch
+current_branch=`cat .shrug/current_branch`
+
+# Checking if the desired branch exists
+if test -d .shrug/branches/$1
+then
+    # Branch exists
+    # Saving current files into stash
+    rm -rf .shrug/branches/$current_branch/stash/*
+    cp -R * .shrug/branches/$current_branch/stash
+
+    # Copying latest files from branch
+    if test -d .shrug/branches/$1/stash
+    then
+        # There is a branch with stashed work
+        # Copying from previous stash
+        cp -r .shrug/branches/$1/stash/* .
+    else
+        # There is no stashed work so copying if there has been commits in the branch
+        # Copying if there has been at least one commit
+        if [ $(ls .shrug/branches/$1 | wc -l) != 1 ]
+        then
+            # There has been at least one commit
+            # Getting previous commit id
+            previous_commit_id=`ls .shrug/branches/$current_branch | sort -n | tail -1`
+            if [ $previous_commit_id = "index" ]
+            then
+                previous_commit_id=0
+            fi
+
+            # Transfering files over
+            cp .shrug/branches/$1/$previous_commit_id/saved .
+        fi
+    fi
+
+    # Updating current branch choice
+    echo $1 > .shrug/current_branch
+
+    # Notfying user of success
+    echo "Switched to branch '$1'"
+else
+    # Branch does not exist
+    echo "shrug-chceout: error: unknown branch '$1'"
+fi
