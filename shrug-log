@@ -7,7 +7,7 @@ current_branch=`cat .shrug/current_branch`
 for commit in $(ls .shrug/branches/$current_branch -r)
 do
     # If it is not the index file
-    if [ $commit != "index" ]
+    if [ $commit != "index" ] && [ $commit != "stash" ]
     then
         # Print commit details
         echo -n "$commit "

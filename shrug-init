@@ -13,7 +13,9 @@ then
     echo 0 > .shrug/commit_number
 
     # Creating master branch
-    sh shrug-branch master
+    mkdir .shrug/branches/master
+    mkdir .shrug/branches/master/index
+    mkdir .shrug/branches/master/stash
 
     # Notifying user of successful creation of repository
     echo Initialized empty shrug repository in .shrug
