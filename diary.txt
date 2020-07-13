@@ -5,5 +5,7 @@
 12/07/20 | 1:33pm | 1:50pm | Subset 1 | Figured out the bug, the directory was empty and hence it was using '*' as the files
 12/07/20 | 1:50pm | 1:54pm | Subset 1 | Completed MVP of subset1 after finishing off some styling and autotesting
 12/07/20 | 1:54pm | 4:33pm | Subset 2 | Setting up and cleaning up previous subset code for branches
-12/07/20 | 4:33pm | 7:30pm | Subset 2 | Got up to subset2_23 autotest
-13/07/20 | 8:46am | 
+
+
+
+5;10 break 5:31 back

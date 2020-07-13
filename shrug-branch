@@ -49,7 +49,7 @@ else
         mkdir .shrug/branches/$1
         mkdir .shrug/branches/$1/index
         mkdir .shrug/branches/$1/stash
-        cp -R .shrug/branches/$current_branch/* .shrug/branches/$1/ 2> /dev/null
+        cp ./* .shrug/branches/$1/stash/ 2> /dev/null
     else
         # Branch already exists
         echo "shrug-branch: error: branch '$1' already exists"

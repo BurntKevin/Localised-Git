@@ -10,16 +10,20 @@ then
     # Saving current files into stash
     cp ./* .shrug/branches/$current_branch/stash/
 
-    # Replacing files with files from the new branch
+    # Replacing files with files from branch
     # Removing new files which are not yet saved
     if [ $(ls | wc -l) != 0 ]
     then
         # Directory contains items
         for file in *
         do
-            if ! test -e ".shrug/branches/$1/index/$file"
+            if ! test -e .shrug/branches/$current_branch/index/$file
             then
                 # If it is a new file, delete it
+                rm $file
+            elif [ $(diff .shrug/branches/$current_branch/index/$file $file | wc -l) = 0 ]
+            then
+                # File has been commited
                 rm $file
             fi
         done
@@ -45,22 +49,6 @@ then
                 then
                     cp .shrug/branches/$1/stash/$file ./
                 fi
-            fi
-        done
-    fi
-
-    # Updating index
-    if [ $(ls .shrug/branches/$current_branch/index | wc -l) ]
-    then
-        for file in .shrug/branches/$current_branch/index/*
-        do
-            file=`echo $file | cut -d"/" -f5`
-            if ! test -e .shrug/branches/$1/index/$file
-            then
-                cp .shrug/branches/$current_branch/index/$file .shrug/branches/$1/index
-            elif [ $(date +%s -r .shrug/branches/$current_branch/index/$file) -gt $(date +%s -r .shrug/branches/$1/index/$file) ]
-            then
-                cp .shrug/branches/$current_branch/index/$file .shrug/branches/$1/index
             fi
         done
     fi
