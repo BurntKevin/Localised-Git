@@ -49,6 +49,8 @@ else
         mkdir .shrug/branches/$1
         mkdir .shrug/branches/$1/index
         mkdir .shrug/branches/$1/stash
+
+        cp -r .shrug/branches/$current_branch/* .shrug/branches/$1/
         cp ./* .shrug/branches/$1/stash/ 2> /dev/null
     else
         # Branch already exists
