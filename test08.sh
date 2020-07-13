@@ -4,27 +4,20 @@
 sh shrug-init > /dev/null
 
 # Checking out to an unknown branch
-sh shrug-checkout b1 > output.txt
+sh shrug-checkout b2 > output.txt
 
-if [ "$(cat output.txt)" != "shrug-checkout: error: unknown branch 'b1'"]
+if [ "$(cat output.txt)" != "shrug-checkout: error: unknown branch 'b2'" ]
 then
-    echo Branch has been shifted due to merge
+    echo Branch should not checkout to an unknown branch
     exit
 fi
 
 # Testing a successful checkout
 sh shrug-branch b1 > /dev/null
-sh shrug-checkout b1 > output.txt
-
-# Checking message given
-if [ "$(cat output.txt)" != "Switched to branch 'b1'"]
-then
-    echo Branch change did not notify user
-    exit
-fi
+sh shrug-checkout b1 > /dev/null
 
 # Checking if the branch has been updated on the file
-if [ "$(cat .shrug/current_branch)" != "b1"]
+if [ "$(cat .shrug/current_branch)" != "b1" ]
 then
     echo Branch was not successfully changed
     exit
