@@ -45,7 +45,7 @@ then
                 cp .shrug/branches/$1/stash/$file ./
             else
                 # Replacing file if it has been added to index recently
-                if test -e .shrug/$current_branch/index/$file && [ $(diff $file .shrug/$current_branch/index/$file | wc -l) = 0 ]
+                if test -e .shrug/branches/$current_branch/index/$file && [ $(diff $file .shrug/branches/$current_branch/index/$file | wc -l) = 0 ]
                 then
                     cp .shrug/branches/$1/stash/$file ./
                 fi
