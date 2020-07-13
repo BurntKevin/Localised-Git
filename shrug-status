@@ -12,7 +12,7 @@ fi
 
 # Checking for new files being added
 # Checking if the directory contains files
-if [ $(ls .shrug/branches/$current_branch/$previous_commit_id/saved | wc -l) != 0 ]
+if test -d .shrug/branches/$current_branch/$previous_commit_id/saved && [ $(ls .shrug/branches/$current_branch/$previous_commit_id/saved | wc -l) != 0 ]
 then
     # There are files in the directory
     for file in .shrug/branches/$current_branch/$previous_commit_id/saved/*

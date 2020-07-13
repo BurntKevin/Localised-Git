@@ -10,9 +10,60 @@ then
     # Saving current files into stash
     cp ./* .shrug/branches/$current_branch/stash/
 
-    # Replacing files with files from branch
-    rm -f * 2> /dev/null
-    cp .shrug/branches/$1/stash/* . 2> /dev/null
+    # Replacing files with files from the new branch
+    # Removing new files which are not yet saved
+    if [ $(ls | wc -l) != 0 ]
+    then
+        # Directory contains items
+        for file in *
+        do
+            if ! test -e ".shrug/branches/$1/index/$file"
+            then
+                # If it is a new file, delete it
+                rm $file
+            fi
+        done
+    fi
+    # Copying if file does not yet exist
+    if [ $(ls .shrug/branches/$1/stash | wc -l) != 0 ]
+    then
+        # Directory contains files
+        # Copying files from branch's stash
+        for file in .shrug/branches/$1/stash/*
+        do
+            # Parsing for file name
+            file=`echo $file | cut -d"/" -f5`
+
+            # Copy files
+            if ! test -e $file
+            then
+                # Copying new file to working directory
+                cp .shrug/branches/$1/stash/$file ./
+            else
+                # Replacing file if it has been added to index recently
+                if test -e .shrug/$current_branch/index/$file && [ $(diff $file .shrug/$current_branch/index/$file | wc -l) = 0 ]
+                then
+                    cp .shrug/branches/$1/stash/$file ./
+                fi
+            fi
+        done
+    fi
+
+    # Updating index
+    if [ $(ls .shrug/branches/$current_branch/index | wc -l) ]
+    then
+        for file in .shrug/branches/$current_branch/index/*
+        do
+            file=`echo $file | cut -d"/" -f5`
+            if ! test -e .shrug/branches/$1/index/$file
+            then
+                cp .shrug/branches/$current_branch/index/$file .shrug/branches/$1/index
+            elif [ $(date +%s -r .shrug/branches/$current_branch/index/$file) -gt $(date +%s -r .shrug/branches/$1/index/$file) ]
+            then
+                cp .shrug/branches/$current_branch/index/$file .shrug/branches/$1/index
+            fi
+        done
+    fi
 
     # Updating current branch choice
     echo $1 > .shrug/current_branch
