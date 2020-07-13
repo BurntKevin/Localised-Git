@@ -1,0 +1,13 @@
+#!/bin/dash
+
+# Saving current branch to come back
+current_branch=`cat .shrug/current_branch`
+
+# Going to the right branch to merge
+sh shrug-checkout $1
+
+# Committing all items
+sh shrug-commit -a -m $3
+
+# Going back to original branch
+sh shrug-checkout $1

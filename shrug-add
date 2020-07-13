@@ -14,7 +14,7 @@ then
         then
             # Newly added file
             # Adding new file to the list to be added
-            cp $file .shrug/branches/$current_branch/index/$file
+            cp $file .shrug/branches/$current_branch/index/$file 2> /dev/null
         elif test -e .shrug/branches/$current_branch/index/$file
         then
             # File does not exist in working environment but exists in index
@@ -27,5 +27,5 @@ then
     done
 else
     # Cannot add files as .shrug does not exist
-    echo "shrug-add: error: no .shrug directory containing shrug repository exists"
+    echo shrug-add: error: no .shrug directory containing shrug repository exists
 fi

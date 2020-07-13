@@ -10,7 +10,7 @@ then
         branch=`echo $branch | cut -d"/" -f3`
 
         # Checking if there have been commits
-        if ! test -d .shrug/branches/master/0
+        if ! test -d .shrug/branches/$branch/0
         then
             # Repository does not have any commits
             echo shrug-branch: error: your repository does not have any commits yet
@@ -50,7 +50,7 @@ else
         mkdir .shrug/branches/$1/index
         mkdir .shrug/branches/$1/stash
 
-        cp -r .shrug/branches/$current_branch/* .shrug/branches/$1/
+        cp -r .shrug/branches/$current_branch/* .shrug/branches/$1/ 2> /dev/null
         cp ./* .shrug/branches/$1/stash/ 2> /dev/null
     else
         # Branch already exists

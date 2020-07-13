@@ -106,7 +106,7 @@ then
         # Iterating through all files
         for line in $(ls .shrug/branches/$current_branch/index)
         do
-            cp .shrug/branches/$current_branch/index/$line .shrug/branches/$current_branch/$next_commit_id/saved/$line
+            cp .shrug/branches/$current_branch/index/$line .shrug/branches/$current_branch/$next_commit_id/saved/$line  2> /dev/null
         done
     fi
 

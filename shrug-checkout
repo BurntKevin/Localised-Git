@@ -8,7 +8,7 @@ then
     current_branch=`cat .shrug/current_branch`
 
     # Saving current files into stash
-    cp ./* .shrug/branches/$current_branch/stash/
+    cp ./* .shrug/branches/$current_branch/stash/ 2> /dev/null
 
     # Replacing files with files from branch
     # Removing new files which are not yet saved
@@ -28,6 +28,7 @@ then
             fi
         done
     fi
+
     # Copying if file does not yet exist
     if [ $(ls .shrug/branches/$1/stash | wc -l) != 0 ]
     then
@@ -42,12 +43,12 @@ then
             if ! test -e $file
             then
                 # Copying new file to working directory
-                cp .shrug/branches/$1/stash/$file ./
+                cp .shrug/branches/$1/stash/$file ./ 2> /dev/null
             else
                 # Replacing file if it has been added to index recently
                 if test -e .shrug/branches/$current_branch/index/$file && [ $(diff $file .shrug/branches/$current_branch/index/$file | wc -l) = 0 ]
                 then
-                    cp .shrug/branches/$1/stash/$file ./
+                    cp .shrug/branches/$1/stash/$file ./ 2> /dev/null
                 fi
             fi
         done

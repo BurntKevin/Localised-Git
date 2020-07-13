@@ -5,7 +5,17 @@
 12/07/20 | 1:33pm | 1:50pm | Subset 1 | Figured out the bug, the directory was empty and hence it was using '*' as the files
 12/07/20 | 1:50pm | 1:54pm | Subset 1 | Completed MVP of subset1 after finishing off some styling and autotesting
 12/07/20 | 1:54pm | 4:33pm | Subset 2 | Setting up and cleaning up previous subset code for branches
-
-
-
-5;10 break 5:31 back
+12/07/20 | 4:33pm | 7:30pm | Subset 2 | Got up to subset2_23 autotest
+13/07/20 | 8:46am | 11:22am | Subset 2 | Working more on subset2_23 autotest
+13/07/20 | 1:00pm | 1:28pm | Subset 2 | Realised that the main issue with the file inconsistency is most likely just shrug-checkout
+13/07/20 | 7:45pm | 8:15pm | Subset 2 | Trying to figure out pattern for subset2_23 but when I solve changes not staged for commit by adding to index, test 22 fails
+13/07/20 | 8:21pm | 9:05pm | Testing | Created test00 for shrug-init and test01 for shrug-add
+13/07/20 | 9:05pm | 9:35pm | Testing | Finished test02 for shrug-commit
+13/07/20 | 9:35pm | 10:02pm | Testing | Finished test03 for shrug-rm
+13/07/20 | 10:02pm | 10:24pm | Testing | Finished test04 for shrug-status
+13/07/20 | 10:24pm | 10:37pm | Testing | Finished test05 for shrug-log
+13/07/20 | 10:37pm | 10:46pm | Testing | Finished test06 for shrug-show
+13/07/20 | 10:46pm | 10:55pm | Testing | Finished test07 for shrug-branch
+13/07/20 | 10:55pm | 11:04pm | Testing | Finished test08 for shrug-checkout
+13/07/20 | 11:04pm | 11:10pm | Testing | Finished test09 for shrug-merge
+13/07/20 | 11:10pm | 11:29pm | Finalising | Checking up on work for style
