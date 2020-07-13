@@ -10,4 +10,4 @@ sh shrug-checkout $1
 sh shrug-commit -a -m $3
 
 # Going back to original branch
-sh shrug-checkout $1
+sh shrug-checkout $current_branch
